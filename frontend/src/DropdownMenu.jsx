@@ -19,8 +19,8 @@ function DropdownMenu() {
     return (
         <select>
             {outputTokens.map(token => (
-                <option key={token.id} value={token.value}>
-                    {token.symbol}
+                <option key={token.symbol} value={token.value}>
+                    {token.symbol} 
                 </option>
             ))}
         </select>
