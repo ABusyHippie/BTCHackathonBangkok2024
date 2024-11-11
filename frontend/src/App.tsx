@@ -2,9 +2,10 @@ import React from 'react'
 import { useState } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { SatsWagmiConfig, useConnect } from "@gobob/sats-wagmi";
-import { createMachine } from 'xstate';
+import { createMachine} from 'xstate';
 import { useMachine } from '@xstate/react';
 import DropdownMenu from './DropdownMenu';
+import Gateway from './Gateway'
 
 import reactLogo from "./assets/react.svg";
 import viteLogo from "/vite.svg";
@@ -13,13 +14,13 @@ import "./App.css";
 const queryClient = new QueryClient();
 
 function WalletOptions() {
-  const { connectors, connect } = useConnect()
+  const { connectors, connect } = useConnect();
 
   return connectors.map((connector) => (
     <button key={connector.name} onClick={() => connect({ connector })}>
       {connector.name}
     </button>
-  ))
+  ));
 }
 
 const toggleMachine = createMachine({
@@ -36,7 +37,7 @@ const toggleMachine = createMachine({
 });
 
 function App() {
-  const [count, setCount] = useState(0);
+  const [count, setCount] = useState<number>(0);
   const [state, send] = useMachine(toggleMachine);
 
   return (
