@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { GatewayQuoteParams, GatewaySDK } from "@gobob/bob-sdk";
+import { GatewaySDK } from "@gobob/bob-sdk";
 
 const gatewaySDK = new GatewaySDK("bob");
 
-function DropdownMenu() {
+function DropdownMenu({ setSelectedToken }) {
     const [outputTokens, setOutputTokens] = useState([]);
 
     useEffect(() => {
@@ -17,7 +17,8 @@ function DropdownMenu() {
     }, []);
 
     return (
-        <select>
+        <select onChange={(e) => setSelectedToken(e.target.value)}>
+            <option value="">Select a token</option>
             {outputTokens.map(token => (
                 <option key={token.symbol} value={token.value}>
                     {token.symbol} 

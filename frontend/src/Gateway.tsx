@@ -4,11 +4,9 @@ import { useSendGatewayTransaction } from '@gobob/sats-wagmi';
 import { type Hex, parseUnits } from 'viem';
 import { GatewayQuoteParams, GatewaySDK, GatewayQuote } from "@gobob/bob-sdk";
 
-const gatewaySDK = new GatewaySDK("bob"); // or "bob-sepolia"
+const gatewaySDK = new GatewaySDK("bob");
 
-const outputTokens = await gatewaySDK.getTokens();
-
-function Gateway() {
+function Gateway({ selectedToken }) {
   const {
     data: hash,
     error,
@@ -19,7 +17,7 @@ function Gateway() {
   const [quote, setQuote] = useState<GatewayQuote | null>(null);
 
   const quoteParams = {
-    fromToken: "BTC",
+    fromToken: selectedToken || "BTC",
     fromChain: "Bitcoin",
     fromUserAddress: "bc1qafk4yhqvj4wep57m62dgrmutldusqde8adh20d",
     toChain: "BOB",
@@ -30,13 +28,15 @@ function Gateway() {
   };
 
   async function fetchQuote() {
-    const fetchedQuote = await gatewaySDK.getQuote(quoteParams);
-    setQuote(fetchedQuote);
+    if (selectedToken) {
+      const fetchedQuote = await gatewaySDK.getQuote(quoteParams);
+      setQuote(fetchedQuote);
+    }
   }
 
   useEffect(() => {
     fetchQuote();
-  }, [/* dependencies for when to call fetchQuote */]);
+  }, [selectedToken]);
 
   async function submit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
