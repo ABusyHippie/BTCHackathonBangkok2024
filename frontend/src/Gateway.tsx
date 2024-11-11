@@ -1,7 +1,12 @@
-import type { FormEvent } from 'react';
+import { FormEvent, useEffect, useState } from 'react';
 
 import { useSendGatewayTransaction } from '@gobob/sats-wagmi';
 import { type Hex, parseUnits } from 'viem';
+import { GatewayQuoteParams, GatewaySDK, GatewayQuote } from "@gobob/bob-sdk";
+
+const gatewaySDK = new GatewaySDK("bob"); // or "bob-sepolia"
+
+const outputTokens = await gatewaySDK.getTokens();
 
 function Gateway() {
   const {
@@ -10,6 +15,28 @@ function Gateway() {
     isPending,
     sendGatewayTransaction
   } = useSendGatewayTransaction({ toChain: 'bob-sepolia' });
+
+  const [quote, setQuote] = useState<GatewayQuote | null>(null);
+
+  const quoteParams = {
+    fromToken: "BTC",
+    fromChain: "Bitcoin",
+    fromUserAddress: "bc1qafk4yhqvj4wep57m62dgrmutldusqde8adh20d",
+    toChain: "BOB",
+    toUserAddress: "0x2D2E86236a5bC1c8a5e5499C517E17Fb88Dbc18c",
+    toToken: "tBTC",
+    amount: 10000000, // 0.1 BTC
+    gasRefill: 10000, // 0.0001 BTC
+  };
+
+  async function fetchQuote() {
+    const fetchedQuote = await gatewaySDK.getQuote(quoteParams);
+    setQuote(fetchedQuote);
+  }
+
+  useEffect(() => {
+    fetchQuote();
+  }, [/* dependencies for when to call fetchQuote */]);
 
   async function submit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -30,6 +57,12 @@ function Gateway() {
           {isPending ? 'Confirming...' : 'Send'}
         </button>
       </form>
+      {quote && (
+        <div>
+          <div>Quote Fee: {quote.fee}</div>
+          {/* Render other quote fields as needed */}
+        </div>
+      )}
       {hash && <div>Transaction Hash: {hash}</div>}
       {error && <div>Error: {error.message}</div>}
     </div>
