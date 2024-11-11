@@ -2,7 +2,8 @@ import React from 'react'
 import { useState } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { SatsWagmiConfig, useConnect } from "@gobob/sats-wagmi";
-
+import { createMachine } from 'xstate';
+import { useMachine } from '@xstate/react';
 
 import reactLogo from "./assets/react.svg";
 import viteLogo from "/vite.svg";
@@ -20,8 +21,22 @@ function WalletOptions() {
   ))
 }
 
+const toggleMachine = createMachine({
+  id: 'toggle',
+  initial: 'Inactive',
+  states: {
+    Inactive: {
+      on: { toggle: 'Active' },
+    },
+    Active: {
+      on: { toggle: 'Inactive' },
+    },
+  },
+});
+
 function App() {
   const [count, setCount] = useState(0);
+  const [state, send] = useMachine(toggleMachine);
 
   return (
     <>
@@ -43,6 +58,12 @@ function App() {
       <div className="card">
         <button onClick={() => setCount((count) => count + 1)}>
           count is {count}
+        </button>
+        <button onClick={() => {
+          send({ type: 'toggle' });
+          console.log('Current state:', state.value);
+        }}>
+          Toggle State: {state.value}
         </button>
         <p>
           Edit <code>src/App.jsx</code> and save to test HMR
