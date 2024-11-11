@@ -10,6 +10,7 @@ function DropdownMenu() {
         const fetchTokens = async () => {
             const tokens = await gatewaySDK.getTokens();
             setOutputTokens(tokens);
+            console.log("Fetched tokens:", {tokens});
         };
 
         fetchTokens();
@@ -19,7 +20,7 @@ function DropdownMenu() {
         <select>
             {outputTokens.map(token => (
                 <option key={token.id} value={token.value}>
-                    {token.label}
+                    {token.symbol}
                 </option>
             ))}
         </select>
