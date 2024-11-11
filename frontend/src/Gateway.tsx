@@ -6,7 +6,7 @@ import { GatewayQuoteParams, GatewaySDK, GatewayQuote } from "@gobob/bob-sdk";
 
 const gatewaySDK = new GatewaySDK("bob");
 
-function Gateway({ selectedToken }) {
+function Gateway({ selectedToken }: { selectedToken?: string }) {
   const {
     data: hash,
     error,
