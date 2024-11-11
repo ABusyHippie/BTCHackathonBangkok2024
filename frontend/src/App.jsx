@@ -4,6 +4,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { SatsWagmiConfig, useConnect } from "@gobob/sats-wagmi";
 import { createMachine } from 'xstate';
 import { useMachine } from '@xstate/react';
+import DropdownMenu from './DropdownMenu';
 
 import reactLogo from "./assets/react.svg";
 import viteLogo from "/vite.svg";
@@ -72,6 +73,7 @@ function App() {
       <p className="read-the-docs">
         Click on the Vite and React logos to learn more
       </p>
+      <DropdownMenu />
     </>
   );
 }
