@@ -25,7 +25,7 @@ function App() {
         </a>
       </div>
       <h1>Magnus Lending</h1>
-      <h3>Universal Bitcoin L2 DeFi for BOB, RSK, and more</h3>
+      <h3>Universal Bitcoin L2 DeFi for BTC L2s</h3>
       <div>
         <QueryClientProvider client={queryClient}>
           <SatsWagmiConfig network="testnet" queryClient={queryClient}>
