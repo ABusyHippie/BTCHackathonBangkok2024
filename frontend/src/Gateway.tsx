@@ -29,6 +29,7 @@ function Gateway({ selectedToken }: { selectedToken?: string }) {
     toToken: "tBTC",
     amount: 10000000, // 0.1 BTC
     gasRefill: 10000, // 0.0001 BTC
+    feeRate: 5,
   };
 
   async function fetchQuote() {
