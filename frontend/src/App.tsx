@@ -13,8 +13,8 @@ import "./App.css";
 const queryClient = new QueryClient();
 
 function App() {
-  const [count, setCount] = useState<number>(0);
-  const { state, send } = useGlobalState();
+  // const [count, setCount] = useState<number>(0);
+  // const { state, send } = useGlobalState();
 
   return (
     <GlobalStateProvider>
