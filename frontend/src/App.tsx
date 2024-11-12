@@ -1,25 +1,16 @@
 import React, { useState } from 'react';
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { SatsWagmiConfig, useConnect } from "@gobob/sats-wagmi";
+import { SatsWagmiConfig } from "@gobob/sats-wagmi";
 import { GlobalStateProvider, useGlobalState } from './xstate';
 import DropdownMenu from './DropdownMenu';
 import Gateway from './Gateway';
+import WalletConnectButton from './WalletConnectButton';
 
 import reactLogo from "./assets/react.svg";
 import viteLogo from "/vite.svg";
 import "./App.css";
 
 const queryClient = new QueryClient();
-
-function WalletOptions() {
-  const { connectors, connect } = useConnect();
-
-  return connectors.map((connector) => (
-    <button key={connector.name} onClick={() => connect({ connector })}>
-      {connector.name}
-    </button>
-  ));
-}
 
 function App() {
   const [count, setCount] = useState<number>(0);
@@ -40,12 +31,10 @@ function App() {
       <div>
         <QueryClientProvider client={queryClient}>
           <SatsWagmiConfig network="testnet" queryClient={queryClient}>
-            <WalletOptions />
-            <div />
+            <WalletConnectButton />
+            <DropdownMenu setSelectedToken={setSelectedToken} />
+            <Gateway selectedToken={selectedToken} />
           </SatsWagmiConfig>
-          <div />
-          <DropdownMenu setSelectedToken={setSelectedToken} />
-          <Gateway selectedToken={selectedToken} />
         </QueryClientProvider>
       </div>
       <div className="card">
