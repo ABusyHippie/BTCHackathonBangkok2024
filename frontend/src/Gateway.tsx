@@ -23,7 +23,7 @@ function Gateway({ selectedToken }: { selectedToken?: string }) {
   const quoteParams = {
     fromToken: selectedToken || "BTC",
     fromChain: "Bitcoin",
-    fromUserAddress: "bc1qafk4yhqvj4wep57m62dgrmutldusqde8adh20d",
+    fromUserAddress: "tb1qdqhwqehmxcua57ptlje3ttgqdcxu4gcktc8e0m",
     toChain: "bob-sepolia",
     toUserAddress: "0x2D2E86236a5bC1c8a5e5499C517E17Fb88Dbc18c",
     toToken: "tBTC",
