@@ -2,9 +2,8 @@ import React, { useState } from 'react';
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { SatsWagmiConfig } from "@gobob/sats-wagmi";
 import { GlobalStateProvider, useGlobalState } from './xstate';
-import DropdownMenu from './DropdownMenu';
-import Gateway from './Gateway';
 import WalletConnectButton from './WalletConnectButton';
+import GatewayModule from './GatewayModule';
 
 import reactLogo from "./assets/react.svg";
 import viteLogo from "/vite.svg";
@@ -15,7 +14,6 @@ const queryClient = new QueryClient();
 function App() {
   const [count, setCount] = useState<number>(0);
   const { state, send } = useGlobalState();
-  const [selectedToken, setSelectedToken] = useState<string | null>(null);
 
   return (
     <GlobalStateProvider>
@@ -32,25 +30,24 @@ function App() {
         <QueryClientProvider client={queryClient}>
           <SatsWagmiConfig network="testnet" queryClient={queryClient}>
             <WalletConnectButton />
-            <DropdownMenu setSelectedToken={setSelectedToken} />
-            <Gateway selectedToken={selectedToken} />
+            <GatewayModule />
           </SatsWagmiConfig>
         </QueryClientProvider>
       </div>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
+      {/* <div className="card"> */}
+        {/* <button onClick={() => setCount((count) => count + 1)}>
           count is {count}
         </button>
         <button onClick={() => send({ type: 'TOGGLE' })}>
           Current State: {state.value}
-        </button>
-        <p>
+        </button> */}
+        {/* <p>
           Edit <code>src/App.jsx</code> and save to test HMR
         </p>
       </div>
       <p className="read-the-docs">
         Click on the Vite and React logos to learn more
-      </p>
+      </p> */}
     </GlobalStateProvider>
   );
 }
