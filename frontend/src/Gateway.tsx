@@ -1,11 +1,12 @@
-import { FormEvent, useEffect, useState } from 'react';
+import { FormEvent, useEffect, useState } from "react";
 
-import { useSendGatewayTransaction } from '@gobob/sats-wagmi';
-import { type Hex, parseUnits } from 'viem';
+import { useSendGatewayTransaction } from "@gobob/sats-wagmi";
+import { type Hex, parseUnits } from "viem";
 import { GatewayQuoteParams, GatewaySDK, GatewayQuote } from "@gobob/bob-sdk";
-import { base64 } from '@scure/base';
-import { Transaction } from '@scure/btc-signer';
+import { base64 } from "@scure/base";
+import { Transaction } from "@scure/btc-signer";
 
+console.groupCollapsed("fckin logs");
 const gatewaySDK = new GatewaySDK("bob-sepolia");
 
 function Gateway({ selectedToken }: { selectedToken?: string }) {
@@ -13,11 +14,11 @@ function Gateway({ selectedToken }: { selectedToken?: string }) {
     data: hash,
     error,
     isPending,
-    sendGatewayTransaction
-  } = useSendGatewayTransaction({ toChain: 'bob-sepolia' });
+    sendGatewayTransaction,
+  } = useSendGatewayTransaction({ toChain: "bob-sepolia" });
 
   const [quote, setQuote] = useState<GatewayQuote | null>(null);
-  const [orderStatus, setOrderStatus] = useState<string>('');
+  const [orderStatus, setOrderStatus] = useState<string>("");
 
   const quoteParams = {
     fromToken: selectedToken || "BTC",
@@ -43,16 +44,20 @@ function Gateway({ selectedToken }: { selectedToken?: string }) {
 
   async function handleSwap(evmAddress: Hex, amount: number) {
     try {
-      setOrderStatus('Creating order...');
-      const { uuid, psbtBase64 } = await gatewaySDK.startOrder(quote!, quoteParams);
-      
-      setOrderStatus('Signing transaction...');
+      setOrderStatus("Creating order...");
+      const { uuid, psbtBase64 } = await gatewaySDK.startOrder(
+        quote!,
+        quoteParams
+      );
+
+      setOrderStatus("Signing transaction...");
       const tx = Transaction.fromPSBT(base64.decode(psbtBase64!));
-      
-      setOrderStatus('Finalizing order...');
+
+      setOrderStatus("Finalizing order...");
       await gatewaySDK.finalizeOrder(uuid, tx.hex);
-      
-      setOrderStatus('Order completed!');
+
+      setOrderStatus("Order completed!");
+      console.log({ uuid, psbtBase64, tx });
     } catch (error) {
       setOrderStatus(`Error: ${(error as Error).message}`);
     }
@@ -61,22 +66,30 @@ function Gateway({ selectedToken }: { selectedToken?: string }) {
   async function submit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const formData = new FormData(e.target as HTMLFormElement);
-    const evmAddress = formData.get('address') as Hex;
-    const value = formData.get('value') as string;
+    const evmAddress = formData.get("address") as Hex;
+    const value = formData.get("value") as string;
 
     // Convert BTC amount to satoshis
     const amountSats = parseFloat(value) * 100000000;
     await handleSwap(evmAddress, amountSats);
+    console.log({ formData, evmAddress, value, amountSats });
+    console.groupEnd();
   }
 
   return (
     <div>
       <h2>BOB Gateway</h2>
       <form onSubmit={submit}>
-        <input required name='address' placeholder='EVM Address' />
-        <input required name='value' placeholder='Amount (BTC)' step='0.00000001' type='number' />
-        <button disabled={isPending} type='submit'>
-          {isPending ? 'Confirming...' : 'Send'}
+        <input required name="address" placeholder="EVM Address" />
+        <input
+          required
+          name="value"
+          placeholder="Amount (BTC)"
+          step="0.00000001"
+          type="number"
+        />
+        <button disabled={isPending} type="submit">
+          {isPending ? "Confirming..." : "Send"}
         </button>
       </form>
       {quote && (
