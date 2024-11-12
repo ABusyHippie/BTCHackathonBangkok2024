@@ -9,7 +9,7 @@ const GatewayModule: React.FC = () => {
   return (
     <div className="gateway-module">
       <div className="gateway-container">
-        <h2>Gateway Module</h2>
+        <h2>BOB Gateway</h2>
         <DropdownMenu setSelectedToken={setSelectedToken} />
         <Gateway selectedToken={selectedToken} />
       </div>

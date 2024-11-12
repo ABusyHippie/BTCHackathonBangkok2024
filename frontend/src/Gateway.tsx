@@ -79,7 +79,6 @@ function Gateway({ selectedToken }: { selectedToken?: string }) {
 
   return (
     <div>
-      <h2>BOB Gateway</h2>
       <form onSubmit={submit}>
         <input required name="address" placeholder="EVM Address" />
         <input

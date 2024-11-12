@@ -27,7 +27,8 @@ function App() {
           <img src={reactLogo} className="logo react" alt="React logo" />
         </a>
       </div>
-      <h1>Universal BTC Wallet</h1>
+      <h1>Magnus Lending</h1>
+      <h3>Universal Bitcoin L2 DeFi for BOB, RSK, and more</h3>
       <div>
         <QueryClientProvider client={queryClient}>
           <SatsWagmiConfig network="testnet" queryClient={queryClient}>

@@ -3,12 +3,18 @@ import { useConnect } from "@gobob/sats-wagmi";
 
 function WalletConnectButton() {
   const [isOpen, setIsOpen] = useState(false);
-  const { connectors, connect } = useConnect();
+  const { connectors, connect, isSuccess } = useConnect();
 
   return (
     <div style={{ position: 'absolute', top: '20px', right: '20px' }}>
-      <button onClick={() => setIsOpen(!isOpen)}>
-        Connect Wallet
+      <button 
+        onClick={() => setIsOpen(!isOpen)}
+        style={{
+          border: isSuccess ? '2px solid #4CAF50' : '1px solid #646cff',
+          transition: 'border 0.3s ease'
+        }}
+      >
+        {isSuccess ? 'Wallet Connected' : 'Connect Wallet'}
       </button>
       {isOpen && (
         <div style={{
