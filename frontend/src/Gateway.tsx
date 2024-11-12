@@ -3,8 +3,10 @@ import { FormEvent, useEffect, useState } from 'react';
 import { useSendGatewayTransaction } from '@gobob/sats-wagmi';
 import { type Hex, parseUnits } from 'viem';
 import { GatewayQuoteParams, GatewaySDK, GatewayQuote } from "@gobob/bob-sdk";
+import { base64 } from '@scure/base';
+import { Transaction } from '@scure/btc-signer';
 
-const gatewaySDK = new GatewaySDK("bob");
+const gatewaySDK = new GatewaySDK("bob-sepolia");
 
 function Gateway({ selectedToken }: { selectedToken?: string }) {
   const {
@@ -15,12 +17,13 @@ function Gateway({ selectedToken }: { selectedToken?: string }) {
   } = useSendGatewayTransaction({ toChain: 'bob-sepolia' });
 
   const [quote, setQuote] = useState<GatewayQuote | null>(null);
+  const [orderStatus, setOrderStatus] = useState<string>('');
 
   const quoteParams = {
     fromToken: selectedToken || "BTC",
     fromChain: "Bitcoin",
     fromUserAddress: "bc1qafk4yhqvj4wep57m62dgrmutldusqde8adh20d",
-    toChain: "BOB",
+    toChain: "bob-sepolia",
     toUserAddress: "0x2D2E86236a5bC1c8a5e5499C517E17Fb88Dbc18c",
     toToken: "tBTC",
     amount: 10000000, // 0.1 BTC
@@ -38,13 +41,32 @@ function Gateway({ selectedToken }: { selectedToken?: string }) {
     fetchQuote();
   }, [selectedToken]);
 
+  async function handleSwap(evmAddress: Hex, amount: number) {
+    try {
+      setOrderStatus('Creating order...');
+      const { uuid, psbtBase64 } = await gatewaySDK.startOrder(quote!, quoteParams);
+      
+      setOrderStatus('Signing transaction...');
+      const tx = Transaction.fromPSBT(base64.decode(psbtBase64!));
+      
+      setOrderStatus('Finalizing order...');
+      await gatewaySDK.finalizeOrder(uuid, tx.hex);
+      
+      setOrderStatus('Order completed!');
+    } catch (error) {
+      setOrderStatus(`Error: ${(error as Error).message}`);
+    }
+  }
+
   async function submit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const formData = new FormData(e.target as HTMLFormElement);
     const evmAddress = formData.get('address') as Hex;
     const value = formData.get('value') as string;
 
-    sendGatewayTransaction({ toToken: 'tBTC', evmAddress, value: parseUnits(value, 8) });
+    // Convert BTC amount to satoshis
+    const amountSats = parseFloat(value) * 100000000;
+    await handleSwap(evmAddress, amountSats);
   }
 
   return (
@@ -65,6 +87,7 @@ function Gateway({ selectedToken }: { selectedToken?: string }) {
       )}
       {hash && <div>Transaction Hash: {hash}</div>}
       {error && <div>Error: {error.message}</div>}
+      {orderStatus && <div>Status: {orderStatus}</div>}
     </div>
   );
 }
