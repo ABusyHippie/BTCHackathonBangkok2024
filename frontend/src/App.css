@@ -15,7 +15,7 @@
 }
 
 .logo {
-  height: 2em;
+  height: 6em;
   padding: 0.3em;
   will-change: filter;
   transition: filter 300ms;
