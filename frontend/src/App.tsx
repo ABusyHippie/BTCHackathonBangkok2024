@@ -4,6 +4,7 @@ import { SatsWagmiConfig } from "@gobob/sats-wagmi";
 import { GlobalStateProvider, useGlobalState } from './xstate';
 import WalletConnectButton from './WalletConnectButton';
 import GatewayModule from './GatewayModule';
+import ReactiveBackground from './ReactiveBackground';
 
 import reactLogo from "./assets/react.svg";
 import viteLogo from "/vite.svg";
@@ -17,6 +18,7 @@ function App() {
 
   return (
     <GlobalStateProvider>
+      <ReactiveBackground />
       <div className="logo-container">
         <a href="https://vite.dev" target="_blank">
           <img src={viteLogo} className="logo" alt="Vite logo" />
