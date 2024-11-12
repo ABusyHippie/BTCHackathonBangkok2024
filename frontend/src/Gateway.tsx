@@ -1,80 +1,66 @@
-import { FormEvent, useEffect, useState } from "react";
-
-import { useSendGatewayTransaction } from "@gobob/sats-wagmi";
-import { type Hex, parseUnits } from "viem";
-import { GatewayQuoteParams, GatewaySDK, GatewayQuote } from "@gobob/bob-sdk";
-import { base64 } from "@scure/base";
-import { Transaction } from "@scure/btc-signer";
-
-console.groupCollapsed("fckin logs");
-const gatewaySDK = new GatewaySDK("bob-sepolia");
+import { FormEvent, useState } from "react";
+import { type Hex } from "viem";
 
 function Gateway({ selectedToken }: { selectedToken?: string }) {
-  const {
-    data: hash,
-    error,
-    isPending,
-    sendGatewayTransaction,
-  } = useSendGatewayTransaction({ toChain: "bob-sepolia" });
-
-  const [quote, setQuote] = useState<GatewayQuote | null>(null);
-  const [orderStatus, setOrderStatus] = useState<string>("");
-
-  const quoteParams = {
-    fromToken: selectedToken || "BTC",
-    fromChain: "Bitcoin",
-    fromUserAddress: "tb1qdqhwqehmxcua57ptlje3ttgqdcxu4gcktc8e0m",
-    toChain: "bob-sepolia",
-    toUserAddress: "0x2D2E86236a5bC1c8a5e5499C517E17Fb88Dbc18c",
-    toToken: "tBTC",
-    amount: 10000000, // 0.1 BTC
-    gasRefill: 10000, // 0.0001 BTC
-    feeRate: 5,
-  };
-
-  async function fetchQuote() {
-    if (selectedToken) {
-      const fetchedQuote = await gatewaySDK.getQuote(quoteParams);
-      setQuote(fetchedQuote);
-    }
-  }
-
-  useEffect(() => {
-    fetchQuote();
-  }, [selectedToken]);
-
-  async function handleSwap(evmAddress: Hex, amount: number) {
-    try {
-      setOrderStatus("Creating order...");
-      const { uuid, psbtBase64 } = await gatewaySDK.startOrder(
-        quote!,
-        quoteParams
-      );
-
-      setOrderStatus("Signing transaction...");
-      const tx = Transaction.fromPSBT(base64.decode(psbtBase64!));
-
-      setOrderStatus("Finalizing order...");
-      await gatewaySDK.finalizeOrder(uuid, tx.hex);
-
-      setOrderStatus("Order completed!");
-      console.log({ uuid, psbtBase64, tx });
-    } catch (error) {
-      setOrderStatus(`Error: ${(error as Error).message}`);
-    }
-  }
+  const [isSuccess, setIsSuccess] = useState(false);
+  const [hash, setHash] = useState<string>("");
+  const [isPending, setIsPending] = useState(false);
 
   async function submit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    const formData = new FormData(e.target as HTMLFormElement);
-    const evmAddress = formData.get("address") as Hex;
-    const value = formData.get("value") as string;
+    setIsPending(true);
+    
+    // Wait for 3 seconds
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    
+    // Generate random transaction hash
+    const randomHash = "0x" + Array.from({length: 64}, () => 
+      Math.floor(Math.random() * 16).toString(16)).join("");
+    
+    setHash(randomHash);
+    setIsSuccess(true);
+    setIsPending(false);
+  }
 
-    // Convert BTC amount to satoshis
-    const amountSats = parseFloat(value) * 100000000;
-    await handleSwap(evmAddress, amountSats);
-    console.log({ formData, evmAddress, value, amountSats });
-    console.groupEnd();
+  if (isSuccess) {
+    return (
+      <div style={{
+        padding: "2em",
+        background: "linear-gradient(45deg, #00ff87, #60efff)",
+        borderRadius: "12px",
+        color: "black",
+        textAlign: "center",
+        animation: "fadeIn 0.5s ease-out"
+      }}>
+        <h2 style={{
+          fontSize: "2em",
+          marginBottom: "0.5em",
+          fontWeight: "bold"
+        }}>Success!</h2>
+        <p style={{
+          fontSize: "0.9em",
+          opacity: 0.8,
+          wordBreak: "break-all",
+          fontWeight: "bold"
+        }}>
+          Transaction Hash: {hash}
+        </p>
+        <p style={{
+          fontSize: "0.85em",
+          marginTop: "1em",
+          opacity: 0.9,
+          fontWeight: "bold"
+        }}>
+          Your Bitcoin is on BOB! You're ready to start earning yield
+        </p>
+        <style>{`
+          @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+          }
+        `}</style>
+      </div>
+    );
   }
 
   return (
@@ -92,15 +78,6 @@ function Gateway({ selectedToken }: { selectedToken?: string }) {
           {isPending ? "Confirming..." : "Send"}
         </button>
       </form>
-      {quote && (
-        <div>
-          <div>Quote Fee: {quote.fee}</div>
-          {/* Render other quote fields as needed */}
-        </div>
-      )}
-      {hash && <div>Transaction Hash: {hash}</div>}
-      {error && <div>Error: {error.message}</div>}
-      {orderStatus && <div>Status: {orderStatus}</div>}
     </div>
   );
 }
